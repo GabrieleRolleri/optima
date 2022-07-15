@@ -231,6 +231,20 @@ double computeEquilibrium(int iPop, double rho,
 
   // bgk collision term
 void bgk(double* fPop, void* selfData) {
+
+}
+
+void simdfebgk(const int size, double*f, double* omegaV, double* fout){
+    int i;
+    for(i=0; i<9*size; ++i){
+        fout[i] = f[i];
+    }
+    for(i = 0; i<size; ++i){
+        simbgk((fout+i*9), omegaV+i);
+    }
+}
+
+void simbgk(double* fPop, void* selfData) {
     double omega = *((double*)selfData);
     double rho, ux, uy;
     computeMacros(fPop, &rho, &ux, &uy);
@@ -239,7 +253,9 @@ void bgk(double* fPop, void* selfData) {
     for(iPop=0; iPop<9; ++iPop) {
         fPop[iPop] *= (1-omega);
         fPop[iPop] += omega * computeEquilibrium (
-                                  iPop, rho, ux, uy, uSqr );
+                iPop, rho, ux, uy, uSqr );
     }
 }
+
+
 

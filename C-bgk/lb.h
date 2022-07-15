@@ -57,6 +57,7 @@ typedef struct {
     Dynamics* dynamics;
 } Node;
 
+
 void constructNode(Node* node);
 void iniEquilibrium(Node* node, double rho, double ux, double uy);
 
@@ -96,5 +97,7 @@ double computeEquilibrium(int iPop, double rho,
                           double ux, double uy, double uSqr);
   // bgk collision term
 void bgk(double* fPop, void* selfData);
+void simbgk(double* fPop, void* selfData);
+void simdfebgk(const int size, double*f, double* omegaV, double* fout);
 
 #endif

@@ -65,6 +65,10 @@ Dynamics* rightBoundary;  //   function iniData()
 VelocityBCData* poiseuilleBoundary;
 PressureBCData* pressureBoundary;
 
+double * f;        //pointers to outward dfe data for computation of the bgk function
+double * fout;
+double * omegaV;
+
   // The main object containing the simulation
 Simulation sim;
 
@@ -93,6 +97,10 @@ void iniData() {
     pressureBoundary =
         (PressureBCData*) calloc(ly+2, sizeof(PressureBCData));
 
+    f = (double*) calloc(9*(lx+2)*(ly+2), sizeof(double));
+    fout = (double*) calloc(9*(lx+2)*(ly+2), sizeof(double));
+    omegaV = (double*) calloc((lx+2)*(ly+2), sizeof(double));
+
     leftBoundary  = (Dynamics*) calloc(ly+2, sizeof(Dynamics));
     rightBoundary = (Dynamics*) calloc(ly+2, sizeof(Dynamics));
 
@@ -110,6 +118,9 @@ void iniData() {
         rightBoundary[iY].selfData
             = (void*)&pressureBoundary[iY];
     }
+
+
+
 }
 
   // De-allocation of the memory
@@ -118,6 +129,9 @@ void freeData() {
     free(leftBoundary);
     free(poiseuilleBoundary);
     free(pressureBoundary);
+    free(f);
+    free(fout);
+    free(omegaV);
 }
 
   // compute parabolic Poiseuille profile
@@ -179,6 +193,25 @@ void updateZeroGradientBoundary() {
         computeMacros(sim.lattice[lx-2][iY].fPop, &rho2, &ux2,&uy2);
         pressureBoundary[iY].rho = 4./3.*rho1 - 1./3.*rho2;
         pressureBoundary[iY].uPar = 0.;
+    }
+}
+
+void precomputebgk(){
+    int iX, iY, iPop;
+    for(iX=0; iX<=(lx+1); ++iX){
+        for(iY=0; iY<=(ly+1); ++iY){
+            for(iPop=0; iPop<9; ++iPop){
+                f[iPop+9*(iX+iY*(lx+1))] = sim.lattice[iX][iY].fPop[iPop];
+                omegaV[iX+iY*lx] = *((double*) sim.lattice[iX][iY].dynamics->selfData);
+            }
+        }
+    }
+
+    //dfebgk((lx+2)*(ly+2), f, omegaV, fout)
+    for(iX=0; iX<=(lx+1); ++iX){
+        for(iY=0; iY<=(lx+1); ++iY){
+            sim.tmpLattice[iX][iY].fPop[iPop] = fout[iPop+9*(iX+iY*(lx+1))];
+        }
     }
 }
 
