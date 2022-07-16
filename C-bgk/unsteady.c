@@ -65,10 +65,6 @@ Dynamics* rightBoundary;  //   function iniData()
 VelocityBCData* poiseuilleBoundary;
 PressureBCData* pressureBoundary;
 
-double * f;        //pointers to outward dfe data for computation of the bgk function
-double * fout;
-double * omegaV;
-
   // The main object containing the simulation
 Simulation sim;
 
@@ -84,7 +80,7 @@ void setConstants() {
     nu    = uMax * 2.*obst_r / Re;  // kinematic fluid viscosity
     omega = 1. / (3*nu+1./2.);      // relaxation parameter
 
-    maxT   = 10000;       // total number of iterations
+    maxT   = 100000;       // total number of iterations
     tSave  = 100;          // frequency of periodic saves to disk
 }
 
@@ -96,10 +92,6 @@ void iniData() {
         (VelocityBCData*) calloc(ly+2, sizeof(VelocityBCData));
     pressureBoundary =
         (PressureBCData*) calloc(ly+2, sizeof(PressureBCData));
-
-    f = (double*) calloc(9*(lx+2)*(ly+2), sizeof(double));
-    fout = (double*) calloc(9*(lx+2)*(ly+2), sizeof(double));
-    omegaV = (double*) calloc((lx+2)*(ly+2), sizeof(double));
 
     leftBoundary  = (Dynamics*) calloc(ly+2, sizeof(Dynamics));
     rightBoundary = (Dynamics*) calloc(ly+2, sizeof(Dynamics));
@@ -118,9 +110,6 @@ void iniData() {
         rightBoundary[iY].selfData
             = (void*)&pressureBoundary[iY];
     }
-
-
-
 }
 
   // De-allocation of the memory
@@ -129,9 +118,6 @@ void freeData() {
     free(leftBoundary);
     free(poiseuilleBoundary);
     free(pressureBoundary);
-    free(f);
-    free(fout);
-    free(omegaV);
 }
 
   // compute parabolic Poiseuille profile
@@ -196,38 +182,6 @@ void updateZeroGradientBoundary() {
     }
 }
 
-void precomputebgk(){
-    int iX, iY, iPop;
-    /*for(iX=2; iX<(lx); ++iX){
-        for(iY=2; iY<(ly); ++iY){
-            for(iPop=0; iPop<9; ++iPop){
-                f[iPop+9*(iX+iY*(lx+1))] = sim.lattice[iX][iY].fPop[iPop];
-            }
-
-            omegaV[iX+iY*(lx+1)] = *((double*) sim.lattice[iX][iY].dynamics->selfData);
-        }
-    }*/
-    for(iX=2; iX<lx; ++iX) {
-        for(iY=2; iY<ly; ++iY) {
-            if ( (iX-obst_x)*(iX-obst_x) +
-                 (iY-obst_y)*(iY-obst_y) > obst_r*obst_r )
-            {
-                for(iPop=0; iPop<9; ++iPop){
-                    f[iPop+9*(iX+iY*(lx+1))] = sim.lattice[iX][iY].fPop[iPop];
-                }
-                omegaV[iX+iY*(lx+1)] = *((double*) sim.lattice[iX][iY].dynamics->selfData);
-            }
-        }
-    }
-    simdfebgk((lx+2)*(ly+2), f, omegaV, fout);
-    //dfebgk((lx+2)*(ly+2), f, omegaV, fout)
-    for(iX=0; iX<=(lx+1); ++iX){
-        for(iY=0; iY<=(lx+1); ++iY){
-            sim.tmpLattice[iX][iY].fPop[iPop] = fout[iPop+9*(iX+iY*(lx+1))];
-        }
-    }
-}
-
 static const double t[9] = { 4./9., 1./9., 1./9., 1./9., 1./9.,
                              1./36., 1./36., 1./36., 1./36. };
   // lattice velocities
@@ -256,8 +210,8 @@ int main(int argc, char *argv[]) {
 
           // on the right boundary, outlet condition grad_x u = 0
         updateZeroGradientBoundary();
-        precomputebgk();
-        collide(&sim, lx, ly, obst_x, obst_y, obst_r);
+
+        collide(&sim);
 
           // the data are written to disk after collision, to be
           //   that the macroscopic variables are computed 
