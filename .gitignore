@@ -52,4 +52,5 @@ Mkfile.old
 dkms.conf
 /CMakeLists.txt
 /cmake-build-debug/
+/cmake-build-debug-event-trace/
 .idea/
