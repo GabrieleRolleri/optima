@@ -79,7 +79,7 @@ typedef struct {
 void constructSim(Simulation* sim, int lx, int ly);
 void destructSim(Simulation* sim);
 void setDynamics(Simulation* sim, int iX, int iY, Dynamics* dyn);
-void collide(Simulation* sim);
+void collide(Simulation* sim, int lx, int ly, int, int, int);
 void propagate(Simulation* sim);
 void makePeriodic(Simulation* sim);
 void saveVel(Simulation* sim, char fName[]);
@@ -97,7 +97,7 @@ double computeEquilibrium(int iPop, double rho,
                           double ux, double uy, double uSqr);
   // bgk collision term
 void bgk(double* fPop, void* selfData);
-void simbgk(double* fPop, void* selfData);
+void retbgk(double* fPop, Simulation* sim, int iX, int iY);
 void simdfebgk(const int size, double*f, double* omegaV, double* fout);
 
 #endif

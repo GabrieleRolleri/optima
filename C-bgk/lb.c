@@ -111,13 +111,36 @@ inline static void collideNode(Node* node) {
 }
 
   // apply collision step to all lattice nodes
-void collide(Simulation* sim) {
-    int iX, iY;
-    for (iX=1; iX<=sim->lx; ++iX) {
-        for (iY=1; iY<=sim->ly; ++iY) {
-            collideNode(&(sim->lattice[iX][iY]));
-        }
-    }
+void collide(Simulation* sim, int lx, int ly, int obst_x, int obst_y, int obst_r) {
+      int iX, iY;
+      for(iX=2; iX<lx; ++iX) {
+          for(iY=2; iY<ly; ++iY) {
+
+              // on the obstacle
+              if ( (iX-obst_x)*(iX-obst_x) +
+                   (iY-obst_y)*(iY-obst_y) <= obst_r*obst_r )
+              {
+                  collideNode(&sim->lattice[iX][iY]);
+              }
+                  // bulk
+              else {
+                  retbgk(sim->lattice[iX][iY].fPop, sim, iX, iY);
+              }
+          }
+      }
+
+      // upper and lower boundary
+      for (iX=1; iX<=lx; ++iX) {
+          collideNode(&sim->lattice[iX][1]);
+          collideNode(&sim->lattice[iX][ly]);
+      }
+
+      // left and right boundary
+
+      for (iY=2; iY<=ly-1; ++iY) {
+          collideNode(&sim->lattice[1][iY]);
+          collideNode(&sim->lattice[lx][iY]);
+      }
 }
 
   // apply propagation step with help of temporary memory
@@ -231,7 +254,16 @@ double computeEquilibrium(int iPop, double rho,
 
   // bgk collision term
 void bgk(double* fPop, void* selfData) {
-
+      double omega = *((double*)selfData);
+      double rho, ux, uy;
+      computeMacros(fPop, &rho, &ux, &uy);
+      double uSqr = ux*ux+uy*uy;
+      int iPop;
+      for(iPop=0; iPop<9; ++iPop) {
+          fPop[iPop] *= (1-omega);
+          fPop[iPop] += omega * computeEquilibrium (
+                  iPop, rho, ux, uy, uSqr );
+      }
 }
 
 void simdfebgk(const int size, double*f, double* omegaV, double* fout){
@@ -240,21 +272,14 @@ void simdfebgk(const int size, double*f, double* omegaV, double* fout){
         fout[i] = f[i];
     }
     for(i = 0; i<size; ++i){
-        simbgk((fout+i*9), omegaV+i);
+        bgk((fout+i*9), omegaV+i);
     }
 }
 
-void simbgk(double* fPop, void* selfData) {
-    double omega = *((double*)selfData);
-    double rho, ux, uy;
-    computeMacros(fPop, &rho, &ux, &uy);
-    double uSqr = ux*ux+uy*uy;
+void retbgk(double* fPop, Simulation* sim, int iX, int iY) {
     int iPop;
-    for(iPop=0; iPop<9; ++iPop) {
-        fPop[iPop] *= (1-omega);
-        fPop[iPop] += omega * computeEquilibrium (
-                iPop, rho, ux, uy, uSqr );
-    }
+    for(iPop = 0; iPop<9; ++iPop)
+        fPop[iPop]=sim->tmpLattice[iX][iY].fPop[iPop];
 }
 
 
