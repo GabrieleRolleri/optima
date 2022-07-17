@@ -50,6 +50,7 @@ void constructNode(Node* node) {
         node->fPop[iPop] = 0.;
     }
     node->dynamics = 0;
+    node->isbgk = false;
 }
 
   // initialize a node to its local equilibrium term
@@ -77,6 +78,9 @@ void constructSim(Simulation* sim, int lx, int ly) {
         (Node*) calloc((lx+2)*(ly+2), sizeof(Node));
     sim->lattice        = (Node**) calloc(lx+2, sizeof(Node*));
     sim->tmpLattice     = (Node**) calloc(lx+2, sizeof(Node*));
+
+    sim->indfe = (double*) calloc (10*(lx+2)*(ly+2), sizeof(double));
+    sim->outdfe = (double*) calloc (9*(lx+2)*(ly+2), sizeof(double));
 
     int iX, iY;
     for (iX=0; iX<lx+2; ++iX) {
@@ -112,12 +116,36 @@ inline static void collideNode(Node* node) {
 
   // apply collision step to all lattice nodes
 void collide(Simulation* sim) {
-    int iX, iY;
+    int iX, iY, iPop, count;
+    count = 0;
     for (iX=1; iX<=sim->lx; ++iX) {
         for (iY=1; iY<=sim->ly; ++iY) {
-            collideNode(&(sim->lattice[iX][iY]));
+            if(sim->lattice[iX][iY].isbgk){
+                for(iPop=0; iPop<9; ++iPop){
+                    sim->indfe[10*count+iPop] = sim->lattice[iX][iY].fPop[iPop];
+                }
+                sim->indfe[10*count+iPop] = *((double*) sim->lattice[iX][iY].dynamics->selfData);
+                ++count;
+            }
+            else {
+                collideNode(&(sim->lattice[iX][iY]));
+            }
         }
     }
+
+    //dfe(count, indata, outdata);          Sli-C function to compute on dfe
+
+    count = 0;
+    for (iX=1; iX<=sim->lx; ++iX) {
+        for (iY=1; iY<=sim->ly; ++iY) {
+            if(sim->lattice[iX][iY].isbgk){
+                for(iPop=0; iPop<9; ++iPop){
+                    sim->lattice[iX][iY].fPop[iPop] = sim->indfe[9*count+iPop];
+                }
+                ++count;
+              }
+          }
+      }
 }
 
   // apply propagation step with help of temporary memory

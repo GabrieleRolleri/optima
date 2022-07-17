@@ -146,6 +146,8 @@ void iniGeometry() {
               // elsewhere, use lbgk dynamics
             else {
                 setDynamics(&sim, iX, iY, &bulkDynamics);
+                sim.lattice[iX][iY].isbgk = true;
+                sim.tmpLattice[iX][iY].isbgk = true;
             }
         }
     }
@@ -154,6 +156,8 @@ void iniGeometry() {
     for (iX=1; iX<=lx; ++iX) {
         setDynamics(&sim, iX, 1, &lowerBoundary);
         setDynamics(&sim, iX, ly, &upperBoundary);
+        sim.lattice[iX][iY].isbgk = false;
+        sim.tmpLattice[iX][iY].isbgk = false;
     }
 
       // left boundary: Poiseuille profile, constant through time
@@ -164,6 +168,8 @@ void iniGeometry() {
         poiseuilleBoundary[iY].ux   = uPoiseuille;
         setDynamics(&sim, 1, iY, &leftBoundary[iY]);
         setDynamics(&sim, lx, iY, &rightBoundary[iY]);
+        sim.lattice[iX][iY].isbgk = false;
+        sim.tmpLattice[iX][iY].isbgk = false;
     }
 }
 

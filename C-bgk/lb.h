@@ -31,6 +31,7 @@
 #define LB_H
 
 #include "stddef.h"
+#include "stdbool.h"
 
 /* struct Dynamics                                               */
 /*****************************************************************/
@@ -55,6 +56,7 @@ typedef struct {
 typedef struct {
     double    fPop[9];
     Dynamics* dynamics;
+    bool isbgk;
 } Node;
 
 void constructNode(Node* node);
@@ -73,12 +75,15 @@ typedef struct {
     Node*  tmpMemoryChunk;    // contiguous raw tmp memory
     Node** lattice;           // lattice, points to raw memory
     Node** tmpLattice;        // tmp lasttice, points to raw memory
+    double* outdfe;            //vector for output data of the dfe
+    double* indfe;              //vector for input data of the dfe
 } Simulation;
 
 void constructSim(Simulation* sim, int lx, int ly);
 void destructSim(Simulation* sim);
 void setDynamics(Simulation* sim, int iX, int iY, Dynamics* dyn);
 void collide(Simulation* sim);
+
 void propagate(Simulation* sim);
 void makePeriodic(Simulation* sim);
 void saveVel(Simulation* sim, char fName[]);
