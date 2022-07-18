@@ -11,7 +11,7 @@ class BgkManager {
 		Manager manager = new Manager(params);
 		Kernel kernel = new BgkKernel(manager.makeKernelParameters());
 		manager.setKernel(kernel);
-		manager.setIO(IOType.ALL CPU);
+		manager.setIO(IOType.ALL_CPU);
 		manager.createSLiCinterface();
 		manager.build();
 	}

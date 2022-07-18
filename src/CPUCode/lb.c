@@ -133,14 +133,14 @@ void collide(Simulation* sim) {
         }
     }
 
-    //dfe(count, indata, outdata);          Sli-C function to compute on dfe
+    dfe(count, sim->indfe, sim->outdfe);          //Sli-C function to compute on dfe
 
     count = 0;
     for (iX=1; iX<=sim->lx; ++iX) {
         for (iY=1; iY<=sim->ly; ++iY) {
             if(sim->lattice[iX][iY].isbgk){
                 for(iPop=0; iPop<9; ++iPop){
-                    sim->lattice[iX][iY].fPop[iPop] = sim->indfe[9*count+iPop];
+                    sim->lattice[iX][iY].fPop[iPop] = sim->outdfe[9*count+iPop];
                 }
                 ++count;
               }
@@ -268,6 +268,16 @@ void bgk(double* fPop, void* selfData) {
         fPop[iPop] *= (1-omega);
         fPop[iPop] += omega * computeEquilibrium (
                                   iPop, rho, ux, uy, uSqr );
+    }
+}
+
+void dfe(int size, double* indata, double* outdata){
+    int i;
+    for(i = 0; i < 10 * size; ++i){
+        outdata[i] = indata[i];
+    }
+    for(i = 0; i < size; ++i){
+        bgk(outdata+10*size, (void*) (outdata+10*size+9));
     }
 }
 

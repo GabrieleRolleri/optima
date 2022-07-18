@@ -83,6 +83,7 @@ void constructSim(Simulation* sim, int lx, int ly);
 void destructSim(Simulation* sim);
 void setDynamics(Simulation* sim, int iX, int iY, Dynamics* dyn);
 void collide(Simulation* sim);
+void dfe(int size, double* indata, double* outdata);
 
 void propagate(Simulation* sim);
 void makePeriodic(Simulation* sim);
