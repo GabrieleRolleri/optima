@@ -272,12 +272,13 @@ void bgk(double* fPop, void* selfData) {
 }
 
 void dfe(int size, double* indata, double* outdata){
-    int i;
-    for(i = 0; i < 10 * size; ++i){
-        outdata[i] = indata[i];
+    int i, iPop;
+    for(i = 0; i < size; ++i){
+        for(iPop = 0; iPop<9; ++iPop)
+            outdata[9*i+iPop] = indata[10*i+iPop];
     }
     for(i = 0; i < size; ++i){
-        bgk(outdata+10*size, (void*) (outdata+10*size+9));
+        bgk(outdata+9*i, (void*) (indata+10*i+9));
     }
 }
 

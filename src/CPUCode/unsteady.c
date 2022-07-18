@@ -142,12 +142,16 @@ void iniGeometry() {
                  (iY-obst_y)*(iY-obst_y) <= obst_r*obst_r )
             {
                 setDynamics(&sim, iX, iY, &bounceBackDynamics);
+                sim.lattice[iX][iY].isbgk = false;
+                sim.tmpLattice[iX][iY].isbgk = false;
             }
               // elsewhere, use lbgk dynamics
             else {
                 setDynamics(&sim, iX, iY, &bulkDynamics);
-                sim.lattice[iX][iY].isbgk = true;
-                sim.tmpLattice[iX][iY].isbgk = true;
+                if(iX!=1&&iY!=1&&iX!=lx&&iY!=ly) {
+                    sim.lattice[iX][iY].isbgk = true;
+                    sim.tmpLattice[iX][iY].isbgk = true;
+                }
             }
         }
     }
