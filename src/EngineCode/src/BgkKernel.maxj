@@ -11,6 +11,7 @@ class BgkKernel extends Kernel {VectorsKernel(KernelParameters parameters) {
     super(parameters);
 
     DFEVectorType<DFEVar> nodeType = new DFEVectorType<DFEVar>(dfeFloat(8, 24), 10);
+    DFEVectorType<DFEVar> procnodeType = new DFEVectorType<DFEVar>(dfeFloat(8, 24), 9);
 
     // Input
     DFEVector<DFEVar> inVector = io.input(”inVector”, nodeType);
@@ -29,10 +30,10 @@ class BgkKernel extends Kernel {VectorsKernel(KernelParameters parameters) {
 
 	DFEVar uSqr = ux*ux + uy*uy;
 
-	DFEVector<DFEVar> r1 = nodeType.newInstance(this);
-	DFEVector<DFEVar> r2 = nodeType.newInstance(this);
-	DFEVector<DFEVar> result = nodeType.newInstance(this);
-	DFEVector<DFEVar> c_u = nodeType.newInstance(this);
+	DFEVector<DFEVar> r1 = procnodeType.newInstance(this);
+	DFEVector<DFEVar> r2 = procnodeType.newInstance(this);
+	DFEVector<DFEVar> result = procnodeType.newInstance(this);
+	DFEVector<DFEVar> c_u = procnodeType.newInstance(this);
 
 	int c[][] = { {0,0}, {1,0}, {0,1}, {-1,0}, {0,-1},
                {1,1}, {-1,1}, {-1,-1}, {1,-1} };
@@ -48,5 +49,5 @@ class BgkKernel extends Kernel {VectorsKernel(KernelParameters parameters) {
 	}
 
     // Output
-    io.output(”outVector”, result, nodeType);
+    io.output(”outVector”, result, procnodeType);
 }
