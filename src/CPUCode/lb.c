@@ -133,7 +133,7 @@ void collide(Simulation* sim) {
         }
     }
 
-    dfe(count, sim->indfe, sim->outdfe);          //Sli-C function to compute on dfe
+    dfe(count, sim->indfe, sim->outdfe);          //Sli-C function to compute on dfe, currently a fake implementation using the bgk CPU function
 
     count = 0;
     for (iX=1; iX<=sim->lx; ++iX) {
