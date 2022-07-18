@@ -1,0 +1,52 @@
+package bgk;
+
+import com.maxeler.maxcompiler.v2.kernelcompiler.Kernel;
+import com.maxeler.maxcompiler.v2.kernelcompiler.KernelParameters;
+import com.maxeler.maxcompiler.v2.kernelcompiler.types.base.DFEVar;
+import com.maxeler.maxcompiler.v2.kernelcompiler.types.composite.DFEVector;
+import com.maxeler.maxcompiler.v2.kernelcompiler.types.composite.DFEVectorType;
+
+class BgkKernel extends Kernel {VectorsKernel(KernelParameters parameters) {
+
+    super(parameters);
+
+    DFEVectorType<DFEVar> nodeType = new DFEVectorType<DFEVar>(dfeFloat(8, 24), 10);
+
+    // Input
+    DFEVector<DFEVar> inVector = io.input(”inVector”, nodeType);
+
+
+	DFEVar omega = inVector[9];
+
+	//computeMacros
+
+	DFEVar upperLine = inVector[2] + inVector[5] + inVector[6];
+	DFEVar mediumLine = inVector[0] + inVector[1] + inVector[3];
+	DFEVar lowerLine = inVector[4] + inVector[7] + inVector[8];
+	DFEVar rho = upperLine + mediumLine + lowerLine;
+	DFEVar ux = (inVector[1] + inVector[5] + inVector[8] - inVector[3] - inVector[6] - inVector[7]) / rho;
+	DFEVar uy = (upperLine - lowerLine) / rho;
+
+	DFEVar uSqr = ux*ux + uy*uy;
+
+	DFEVector<DFEVar> r1 = nodeType.newInstance(this);
+	DFEVector<DFEVar> r2 = nodeType.newInstance(this);
+	DFEVector<DFEVar> result = nodeType.newInstance(this);
+	DFEVector<DFEVar> c_u = nodeType.newInstance(this);
+
+	int c[][] = { {0,0}, {1,0}, {0,1}, {-1,0}, {0,-1},
+               {1,1}, {-1,1}, {-1,-1}, {1,-1} };
+    float t[] = { 4/9, 1/9, 1/9, 1/9, 1/9, 1/36, 1/36, 1/36, 1/36 };
+
+	//bgk
+
+	for(int iPop = 0; iPop < 9; ++iPop){
+		r1[iPop] <== inVector[iPop] * ( 1 - omega );
+		c_u[iPop] <== c[iPop][0] * ux + c[iPop][1] * uy;
+		r2[iPop] <== omega * rho * t[iPop] * (1 + 3 * c_u[iPop] + 9/2 * c_u[iPop] * c_u[iPop] - 3/2 * uSqr);
+		result[iPop] <== r1[iPop] + r2[iPop];
+	}
+
+    // Output
+    io.output(”outVector”, result, nodeType);
+}
