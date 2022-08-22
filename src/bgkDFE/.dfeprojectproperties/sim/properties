@@ -1,0 +1,4 @@
+#Sun Aug 21 16:23:36 CEST 2022
+manager=bgkdfe.bgkDFEManager
+jvmargs=-Xmx2G
+parameters=DFEModel\=MAIA target\=DFE_SIM maxFileName\=bgkDFE

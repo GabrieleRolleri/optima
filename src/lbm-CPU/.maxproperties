@@ -1,0 +1,3 @@
+BUILD_FILES ?= /mnt/beegfs/home/jusers/rolleri1/jumax/workspace/bgkDFE/.maxdc_builds_bgkDFE
+BUILD_DIRS ?= 
+SELECTED_MAXFILES ?= 
