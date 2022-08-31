@@ -1,0 +1,19 @@
+!SESSION 2022-08-22 18:55:12.936 -----------------------------------------------
+eclipse.buildId=4.4.2.M20150204-1700
+java.version=1.8.0_322
+java.vendor=Red Hat, Inc.
+BootLoader constants: OS=linux, ARCH=x86_64, WS=gtk, NL=en_US
+Framework arguments:  -product org.eclipse.epp.package.java.product -perspective com.maxeler.maxide.perspectives.MaxPerspective
+Command-line arguments:  -data /mnt/beegfs/home/jusers/rolleri1/jumax/workspace/optima/src -os linux -ws gtk -arch x86_64 -product org.eclipse.epp.package.java.product -perspective com.maxeler.maxide.perspectives.MaxPerspective
+
+!ENTRY org.eclipse.ui 4 4 2022-08-22 18:55:36.725
+!MESSAGE Plugin com.maxeler.maxide.buildhistorymanagement, extension org.eclipse.ui.perspectiveExtensions, id com.maxeler.maxide.views.buildhistorymanagement.buildoverview: Attribute 'relative' not defined.  This attribute is required when relationship="right".
+
+!ENTRY org.eclipse.ui 4 4 2022-08-22 18:55:36.749
+!MESSAGE Unable to process element: view in perspective extension: null
+
+!ENTRY org.eclipse.ui 4 4 2022-08-22 18:56:07.422
+!MESSAGE Bad extension specification
+
+!ENTRY com.maxeler.maxide.hostconfig 4 0 2022-08-22 18:56:07.427
+!MESSAGE startup class must implement org.eclipse.ui.IStartup
